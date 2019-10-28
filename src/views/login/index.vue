@@ -5,14 +5,16 @@
     <el-card>
       <img src="../../assets/logo_index.png" alt />
       <!-- 表单容器  ref="form" 操作dom|组件 :model="form" 绑定表单数据对象
-      label-width="80px" 表单输入框前的文字的宽度-->
-      <el-form ref="form" :model="loginForm">
+      添加动态属性  :rules 是一系列校验规则
+      status-icon属性为输入框添加了表示校验结果的反馈图标-->
+      <el-form ref="form" :model="loginForm" :rules="loginRules" status-icon:rules="rules">
         <!-- 表单选项 label="活动名称" 表单输入框前的文字-->
-        <el-form-item>
+        <!-- el-form-item 组件 添加属性 prop 是需要校验的字段名称 -->
+        <el-form-item prop="mobile">
           <!-- 表单元素 -->
           <el-input v-model="loginForm.mobile" placeholder="请输入手机号"></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="code">
           <!-- 表单元素 -->
           <el-input
             v-model="loginForm.code"
@@ -35,10 +37,32 @@
 <script>
 export default {
   data () {
+    // 校验手机号的函数
+    const checkMobile = (rule, value, callback) => {
+      // 通过校验逻辑判断成功失败
+      // 手机号格式：1开头 第二位3-9 9个数字结尾
+      if (/^1[3-9]\d{9}$/.test(value)) {
+        callback()
+      } else {
+        callback(new Error('手机号格式不对'))
+      }
+    }
     return {
       loginForm: {
         mobile: '',
         code: ''
+      },
+      // 校验规则
+      loginRules: {
+        mobile: [
+          // type: date|email|url  支持  不支持手机号
+          { required: true, message: '请输入手机号', trigger: 'blur' },
+          { validator: checkMobile, trigger: 'blur' }
+        ],
+        code: [
+          { required: true, message: '请输入验证码', trigger: 'blur' },
+          { len: 6, message: '验证码6个字符', trigger: 'blur' }
+        ]
       }
     }
   }
