@@ -8,6 +8,9 @@ import App from './App.vue'
 // @是webpack指定的路径别名  @===‘/src’   绝对路径
 import router from '@/router'
 
+import axios from '@/api'
+Vue.prototype.$http = axios// 全局挂载
+
 Vue.use(ElementUI)
 Vue.config.productionTip = false
 

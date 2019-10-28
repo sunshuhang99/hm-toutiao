@@ -7,7 +7,7 @@
       <!-- 表单容器  ref="form" 操作dom|组件 :model="form" 绑定表单数据对象
       添加动态属性  :rules 是一系列校验规则
       status-icon属性为输入框添加了表示校验结果的反馈图标-->
-      <el-form ref="form" :model="loginForm" :rules="loginRules" status-icon:rules="rules">
+      <el-form ref="loginForm" :model="loginForm" :rules="loginRules" status-icon:rules="rules">
         <!-- 表单选项 label="活动名称" 表单输入框前的文字-->
         <!-- el-form-item 组件 添加属性 prop 是需要校验的字段名称 -->
         <el-form-item prop="mobile">
@@ -27,7 +27,7 @@
           <el-checkbox :value="true">我已阅读并同意用户协议和隐私条款</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" style="width:100%">立即创建</el-button>
+          <el-button @click="login" type="primary" style="width:100%">立即创建</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -55,7 +55,8 @@ export default {
       // 校验规则
       loginRules: {
         mobile: [
-          // type: date|email|url  支持  不支持手机号
+          // type: date|email|url  支持格式  不支持手机号固定格式
+          // trigger: 'blur' 失去焦点时校验
           { required: true, message: '请输入手机号', trigger: 'blur' },
           { validator: checkMobile, trigger: 'blur' }
         ],
@@ -64,6 +65,26 @@ export default {
           { len: 6, message: '验证码6个字符', trigger: 'blur' }
         ]
       }
+    }
+  },
+  methods: {
+    login () {
+      // 获取表单组件的实例  --->调用校验函数
+      this.$refs['loginForm'].validate(valid => {
+        if (valid) {
+          // 发请求 校验手机号和验证码  后台
+          this.$http
+            .post('authorizations', this.loginForm)
+            .then(res => {
+              // 成功
+              this.$router.push('/')
+            })
+            .catch(() => {
+              // 失败 提示
+              this.$message.error('手机号或验证码错误')
+            })
+        }
+      })
     }
   }
 }
